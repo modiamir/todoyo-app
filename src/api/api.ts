@@ -83,6 +83,12 @@ export interface TodoUpdateDTO {
      * @memberof TodoUpdateDTO
      */
     done?: boolean | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof TodoUpdateDTO
+     */
+    subject?: string | null;
 }
 
 /**
