@@ -51,6 +51,12 @@ export interface Todo {
      * @memberof Todo
      */
     done: boolean;
+    /**
+     * 
+     * @type {number}
+     * @memberof Todo
+     */
+    position: number;
 }
 /**
  * 
@@ -89,6 +95,18 @@ export interface TodoUpdateDTO {
      * @memberof TodoUpdateDTO
      */
     subject?: string | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof TodoUpdateDTO
+     */
+    position?: number | null;
+    /**
+     * 
+     * @type {any}
+     * @memberof TodoUpdateDTO
+     */
+    resource?: any | null;
 }
 
 /**

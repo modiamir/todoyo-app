@@ -2,6 +2,7 @@ import {Todo, TodoApiFactory} from "../../api";
 import {createSlice, PayloadAction} from "@reduxjs/toolkit";
 import {AppThunk, RootState} from "../../app/store";
 import {setProgress} from "../progress/progressSlice";
+import update from "immutability-helper";
 
 export interface TodoState {
     todos: {
@@ -54,8 +55,20 @@ export const todoSlice = createSlice({
 
 export const {fetchTodos, setDone, setSubject} = todoSlice.actions;
 
+export const selectTodo = (state: RootState, todoId: number) => {
+    return state.todo.todos.byIds[todoId]
+};
+
 export const selectTodos = (state: RootState) => {
     return state.todo.todos.allIds.map((id) => state.todo.todos.byIds[id])
+};
+
+export const selectTodosMap = (state: RootState) => {
+    return state.todo.todos.byIds
+};
+
+export const selectAllTodoIds = (state: RootState) => {
+    return state.todo.todos.allIds
 };
 
 export const fetchTodosAsync = (): AppThunk => async (
@@ -90,5 +103,26 @@ export const setSubjectAsync = (todo: Todo, subject: string): AppThunk => async 
     dispatch(setProgress({path: '/todos/' + todo.id, method: 'PATCH', status: 'SUCCESSFUL'}))
     dispatch(setSubject({todo, subject}));
 };
+
+export const reorder = (dragIndex: number, hoverIndex: number): AppThunk => (
+    dispatch,
+    getState
+) => {
+    const state = getState()
+    const todos = selectTodos(state)
+    const dragTodo = todos[dragIndex]
+    dispatch(fetchTodos(update(todos, {
+        $splice: [
+            [dragIndex, 1],
+            [hoverIndex, 0, dragTodo],
+        ],
+    })))
+}
+
+export const setPositionAsync = (todoId: string, position: number): AppThunk => async (dispatch) => {
+    dispatch(setProgress({path: '/todos/' + todoId, method: 'PATCH', status: 'PENDING'}))
+    await TodoApiFactory().patchTodoItem(todoId.toString(), {position: position})
+    dispatch(setProgress({path: '/todos/' + todoId, method: 'PATCH', status: 'SUCCESSFUL'}))
+}
 
 export default todoSlice.reducer;
